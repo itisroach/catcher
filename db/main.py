@@ -1,23 +1,50 @@
 import asyncpg
 import asyncio
+from helpers.readEnvVars import ReadEnvVar
 
 
-async def run_db():
-    # creating a connection
-    conne = await asyncpg.connect(user="postgres",database="postgres",password="amirali3362", host="127.0.0.1")
+DBConfig = {
+    "user": ReadEnvVar("DB_USER"),
+    "password": ReadEnvVar("DB_PASS"),
+    "host": ReadEnvVar("DB_ADDR"),
+    "database": ReadEnvVar("DB_NAME")
+}
 
-    # creating table for storing data in it
-    await conne.execute('''
-        CREATE TABLE IF NOT EXISTS data (
-            id              SERIAL PRIMARY KEY,
-            price_rial      BIGINT NOT NULL,
-            price_toman     BIGINT NOT NULL,
-            time            timestamp DEFAULT current_timestamp,
-            channel         VARCHAR(256) NOT NULL,
-            message_id      BIGINT NOT NULL UNIQUE
+
+class Database():
+
+    def __init__(self):
+        self.pool = None
+
+
+    async def init_db(self):
+        self.pool = await asyncpg.create_pool(**DBConfig)
+
+        await self.pool.execute(
+            '''CREATE TABLE IF NOT EXISTS data (
+                id              SERIAL PRIMARY KEY,
+                price_rial      BIGINT NOT NULL,
+                price_toman     BIGINT NOT NULL,
+                time            timestamp DEFAULT current_timestamp,
+                channel         VARCHAR(256) NOT NULL,
+                message_id      BIGINT NOT NULL UNIQUE
+            )'''
         )
 
-    ''')
+    # executing queries like UPDATE, INSERT, DELETE
+    async def execute_query(self, query):
+        async with self.pool.acquire() as connection:
+            return await connection.execute(query)
+        
+    # fetching one row 
+    async def fetch_one_row(self, query):
+        async with self.pool.acquire() as connection:
+            return await connection.fetchrow(query)
 
+    # fething multiple rows
+    async def fetch_rows(self, query):
+        async with self.pool.acquire() as connection:
+            return await connection.fetch(query)
 
-    await conne.close()
+    async def close_connection(self):
+        await self.pool.close()
