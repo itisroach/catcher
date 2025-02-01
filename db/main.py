@@ -1,7 +1,6 @@
 import asyncpg
 import asyncio
-from helpers.readEnvVars import ReadEnvVar
-
+from helpers.tools import ReadEnvVar
 
 DBConfig = {
     "user": ReadEnvVar("DB_USER"),
@@ -23,13 +22,24 @@ class Database():
         await self.pool.execute(
             '''CREATE TABLE IF NOT EXISTS data (
                 id              SERIAL PRIMARY KEY,
-                price_rial      BIGINT NOT NULL,
-                price_toman     BIGINT NOT NULL,
+                price           BIGINT NOT NULL,
+                currency        
                 time            timestamp DEFAULT current_timestamp,
                 channel         VARCHAR(256) NOT NULL,
                 message_id      BIGINT NOT NULL UNIQUE
             )'''
         )
+
+
+        await self.pool.execute("""
+            CREATE INDEX IF NOT EXISTS idx_channel ON channel;
+        """)
+        await self.pool.execute("""
+            CREATE INDEX IF NOT EXISTS idx_message_id ON message_id;
+        """)
+        await self.pool.execute("""
+            CREATE INDEX IF NOT EXISTS idx_price ON price;
+        """)
 
     # executing queries like UPDATE, INSERT, DELETE
     async def execute_query(self, query):
