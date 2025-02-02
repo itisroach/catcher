@@ -22,8 +22,7 @@ class Database():
         await self.pool.execute(
             '''CREATE TABLE IF NOT EXISTS data (
                 id              SERIAL PRIMARY KEY,
-                price           BIGINT NOT NULL,
-                currency        
+                price_toman     BIGINT NOT NULL,
                 time            timestamp DEFAULT current_timestamp,
                 channel         VARCHAR(256) NOT NULL,
                 message_id      BIGINT NOT NULL UNIQUE
@@ -32,19 +31,19 @@ class Database():
 
 
         await self.pool.execute("""
-            CREATE INDEX IF NOT EXISTS idx_channel ON channel;
+            CREATE INDEX IF NOT EXISTS idx_channel ON data(channel)
         """)
         await self.pool.execute("""
-            CREATE INDEX IF NOT EXISTS idx_message_id ON message_id;
+            CREATE INDEX IF NOT EXISTS idx_message_id ON data(message_id)
         """)
         await self.pool.execute("""
-            CREATE INDEX IF NOT EXISTS idx_price ON price;
+            CREATE INDEX IF NOT EXISTS idx_price ON data(price_toman)
         """)
 
     # executing queries like UPDATE, INSERT, DELETE
-    async def execute_query(self, query):
+    async def execute_query(self, query, *args):
         async with self.pool.acquire() as connection:
-            return await connection.execute(query)
+            return await connection.execute(query, *args)
         
     # fetching one row 
     async def fetch_one_row(self, query):
