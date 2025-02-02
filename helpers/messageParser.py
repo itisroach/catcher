@@ -59,12 +59,12 @@ def result_with_coefficient(text, number):
                   case "هزار":
                         number *= 1000
                   case "میلیون":
-                        number *= 1,000,000
+                        number *= 1_000_000
                   case "میلیارد":
-                        number *= 1,000,000,000
+                        number *= 1_000_000_000
                   case "صد":
                         number *= 100
                   case "ده":
                         number *= 10
-
+      print(number)
       return number
