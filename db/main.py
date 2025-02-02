@@ -25,7 +25,7 @@ class Database():
                 price_toman     BIGINT NOT NULL,
                 time            timestamp DEFAULT current_timestamp,
                 channel         VARCHAR(256) NOT NULL,
-                message_id      BIGINT NOT NULL UNIQUE
+                message_id      BIGINT NOT NULL
             )'''
         )
 
