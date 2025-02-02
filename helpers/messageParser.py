@@ -12,7 +12,6 @@ def parse_message(message: str):
 
       
       result = convert_currencies_to_toman(matches)
-
       return result
 
 
@@ -26,9 +25,12 @@ def convert_currencies_to_toman(matches):
             # extracting the currency from text 
             currency = re.findall(currencyReg, m, re.IGNORECASE)
             # a regex for detecting numbers
-            regNum   = r"\b(?:\d{1,3}(?:,\d{3})*|\d+|[\u06F0-\u06F9]+)\b"
+            regNum   = r"\d+,?\d+(?![%$])"
             # extracting the number
             number   = re.findall(regNum, m)
+
+            if not number:
+                  continue 
             # removing any comma in numbers 13,000 => 13000
             number   = int(number[0].replace(",", ""))
             
@@ -38,7 +40,7 @@ def convert_currencies_to_toman(matches):
             # checking if a currency were detected and if they are rial based convert them to toman
             if currency and currency[0].lower() in ["ریال", "rial", "rials", "irr"]:
                   number /= 10
-
+            
             values.append(number)
 
       return values         
