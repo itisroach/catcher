@@ -1,6 +1,8 @@
 import os
 from dotenv import load_dotenv
 from telethon.tl.functions.channels import GetChannelRecommendationsRequest
+from emoji import replace_emoji
+
 # opening a file to read the channels' username
 def GetChannelsId(fileName: str):
     file = open(fileName, "r")
@@ -29,3 +31,7 @@ async def add_data(dbInstance, *args):
             )
     """,
     *args)
+
+# remove emojis in a string
+def remove_emoji(text):
+    return replace_emoji(text, "")
