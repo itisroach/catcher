@@ -3,7 +3,8 @@ import re
 
 def parse_message(message: str):
       reg = r"\b(?:\d{1,3}(?:,\d{3})*|\d+|[\u06F0-\u06F9]+)\s*(?:تومان|ریال|Toman|Rials|Price|قیمت|تومن|\$|buy|sell|معامله|خرید|فروش|IRR|IRT|میلیون تومان|میلیون ریال|هزار تومان|هزار ریال)|" \
-            r"(?:تومان|ریال|Toman|Rials|Price|قیمت|تومن|\$|buy|sell|معامله|خرید|فروش|IRR|IRT|میلیون تومان|میلیون ریال|هزار تومان|هزار ریال)\s*(?:\d{1,3}(?:,\d{3})*|\d+|[\u06F0-\u06F9]+)\b"
+            r"(?:تومان|ریال|Toman|Rials|Price|قیمت|تومن|\$|buy|sell|معامله|خرید|فروش|IRR|IRT|میلیون تومان|میلیون ریال|هزار تومان|هزار ریال)\s*(?:\d{1,3}(?:,\d{3})*|\d+|[\u06F0-\u06F9]+)\b|" \
+            r"\b\d{1,3}(?:,\d{3})+\b"
 
       # some channels use this character for more beautiful texts like this: تـــومان so this line converts it to تومان 
       message = message.replace("ـ", "")
@@ -28,7 +29,7 @@ def convert_currencies_to_toman(matches):
             regNum   = r"\d+,?\d+(?![%$])"
             # extracting the number
             number   = re.findall(regNum, m)
-
+                  
             if not number:
                   continue 
             # removing any comma in numbers 13,000 => 13000
