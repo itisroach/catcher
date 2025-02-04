@@ -6,7 +6,8 @@ DBConfig = {
     "user": ReadEnvVar("DB_USER"),
     "password": ReadEnvVar("DB_PASS"),
     "host": ReadEnvVar("DB_ADDR"),
-    "database": ReadEnvVar("DB_NAME")
+    "database": ReadEnvVar("DB_NAME"),
+    "server_settings": {"client_encoding": "UTF8"} 
 }
 
 
@@ -25,6 +26,8 @@ class Database():
                 price_toman     BIGINT NOT NULL,
                 time            timestamp DEFAULT current_timestamp,
                 channel         VARCHAR(256) NOT NULL,
+                details         TEXT,
+                post_link       TEXT NOT NULL,
                 message_id      BIGINT NOT NULL
             )'''
         )
