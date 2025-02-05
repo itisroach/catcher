@@ -15,23 +15,33 @@ create_products_table = '''
 create_websites_table = '''
     CREATE TABLE IF NOT EXISTS websites (
         id       SERIAL PRIMARY KEY,
-        link     TEXT   NOT NULL,
-        product  INTEGER NOT NULL,
-        CONSTRAINT fK_websites_product
-            FOREIGN KEY(product)
-            REFRENCES products(id)
+        link     TEXT   NOT NULL
     )
 '''
 
 create_phone_numbers_table = '''
     CREATE TABLE IF NOT EXISTS phone_numbers (
         id              SERIAL PRIMARY KEY,
-        phone_number    TEXT   NOT NULL,
-        product  INTEGER NOT NULL,
-        CONSTRAINT fK_websites_product
-            FOREIGN KEY(product)
-            REFRENCES products(id)
+        phone_number    TEXT   NOT NULL
     )
+'''
+
+
+create_website_junction_table = '''
+    CREATE TABLE IF NOT EXISTS products_websites (
+        product_id      INT REFERENCES products(id) ON DELETE CASCADE,
+        website_id      INT REFERENCES websites(id) ON DELETE CASCADE,
+        PRIMARY KEY (product_id, website_id)
+    ) 
+'''
+
+
+create_phone_numbers_junction_table = '''
+    CREATE TABLE IF NOT EXISTS products_phone_numbers (
+        product_id           INT REFERENCES products(id) ON DELETE CASCADE,
+        phone_number_id      INT REFERENCES phone_numbers(id) ON DELETE CASCADE,
+        PRIMARY KEY (product_id, phone_number_id)
+    ) 
 '''
 
 
@@ -44,13 +54,18 @@ fetch_products_query = '''
         p.details,
         p.post_link,
         p.message_id,
-        w.link AS website_link
+        COALESCE(STRING_AGG(DISTINCT w.link, ', '), 'No Website') AS website_links,
+        COALESCE(STRING_AGG(DISTINCT ph.phone_number, ', '), 'No Phone Number') AS phone_numbers
     FROM products p
-    LEFT JOIN websites w ON p.id = w.product
+    LEFT JOIN products_websites pw ON p.id = pw.product_id
+    LEFT JOIN websites w ON pw.website_id = w.id
+    LEFT JOIN products_phone_numbers ppn ON p.id = ppn.product_id
+    LEFT JOIN phone_numbers ph ON ppn.phone_number_id = ph.id
+    GROUP BY p.id
 '''
 
 fetch_product_by_channel_query = '''
-    SELECT 
+   SELECT 
         p.id,
         p.price_toman,
         p.time,
@@ -58,8 +73,30 @@ fetch_product_by_channel_query = '''
         p.details,
         p.post_link,
         p.message_id,
-        w.link AS website_link
+        COALESCE(STRING_AGG(DISTINCT w.link, ', '), 'No Website') AS website_links,
+        COALESCE(STRING_AGG(DISTINCT ph.phone_number, ', '), 'No Phone Number') AS phone_numbers
     FROM products p
-    LEFT JOIN websites w ON p.id = w.product
+    LEFT JOIN products_websites pw ON p.id = pw.product_id
+    LEFT JOIN websites w ON pw.website_id = w.id
+    LEFT JOIN products_phone_numbers ppn ON p.id = ppn.product_id
+    LEFT JOIN phone_numbers ph ON ppn.phone_number_id = ph.id
     WHERE p.channel = $1 
+    GROUP BY p.id
+'''
+
+insert_to_phone_numbers_query = '''
+    INSERT INTO phone_numbers (phone_number) VALUES ($1) RETURNING id
+'''
+
+
+insert_to_phone_numbers_junction_query = '''
+    INSERT INTO products_phone_numbers(product_id, phone_number_id) VALUES ($1, $2)
+'''
+
+insert_to_website_query = '''
+    INSERT INTO websites (link) VALUES ($1) RETURNING id
+'''
+
+insert_to_website_junction_query = '''
+    INSERT INTO products_websites(product_id, website_id) VALUES ($1, $2)
 '''
