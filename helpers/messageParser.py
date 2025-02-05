@@ -30,8 +30,6 @@ def convert_currencies_to_toman(matches):
             currencyReg = r"(?:تومان|ریال|Toman|Rials|Price|قیمت|تومن|\$|buy|sell|خرید|فروش|IRR|IRT)|(?<=\d)\$"
             # extracting the currency from text 
             currency = re.findall(currencyReg, m, re.IGNORECASE)
-            # a regex for detecting numbers
-            # regNum   = r"\b(?:\d{1,3}(?:[,.]\d{3})*|\d+)\b"
             # extracting the number
             
             number   = re.findall(r"\b(?![0+-])\d{5,}\b", m)

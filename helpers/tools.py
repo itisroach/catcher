@@ -20,18 +20,6 @@ def GetChannelsId(fileName: str):
         return
 
 
-def MarkAsSubscribed(path: str, usernames: list):
-    for idx in range(0, len(usernames)):
-        # adding star as subscribed already
-        if "*" in usernames[idx]:
-            continue
-        usernames[idx] = f"{usernames[idx].replace("\n", "")} * \n"
-
-    file = open(path, "w")
-
-    file.writelines(usernames)
-    file.close()
-
 load_dotenv()
 
 def ReadEnvVar(name: str):
