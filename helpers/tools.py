@@ -7,11 +7,30 @@ from db import queries
 
 # opening a file to read the channels' username
 def GetChannelsId(fileName: str):
-    file = open(fileName, "r")
-    channelIds = file.readlines()
+    # if file extension is not .txt
+    if not fileName.lower().endswith(".txt"):
+        print("only .txt file allowed")
+        return
+    try:
+        file = open(fileName, "r")
+        channelIds = file.readlines()
+        return channelIds
+    except FileNotFoundError:
+        print("file not found")
+        return
 
-    return channelIds
 
+def MarkAsSubscribed(path: str, usernames: list):
+    for idx in range(0, len(usernames)):
+        # adding star as subscribed already
+        if "*" in usernames[idx]:
+            continue
+        usernames[idx] = f"{usernames[idx].replace("\n", "")} * \n"
+
+    file = open(path, "w")
+
+    file.writelines(usernames)
+    file.close()
 
 load_dotenv()
 
