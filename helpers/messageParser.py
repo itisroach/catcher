@@ -1,19 +1,17 @@
 import re
 from .tools import convert_numbers, extract_details
 
-def parse_message(message: str):
-      reg = r"^.*\b(?:\d{1,3}(?:,\d{3})*|\d+|[\u06F0-\u06F9]+)\s*(?:تومان|ریال|Toman|Rials|Price|قیمت|تومن|\$|buy|sell|معامله|خرید|فروش|IRR|IRT|میلیون تومان|میلیون ریال|هزار تومان|هزار ریال)\b.*$|"\
-            r"^.*\b(?:تومان|ریال|Toman|Rials|Price|قیمت|تومن|\$|buy|sell|معامله|خرید|فروش|IRR|IRT|میلیون تومان|میلیون ریال|هزار تومان|هزار ریال)\s*(?:\d{1,3}(?:,\d{3})*|\d+|[\u06F0-\u06F9]+)\b.*$" \
-            r"^.*\b\d{1,3}(?:,\d{3})+\b.*$|" \
-            r"^.*\b\d{5,}\b.*$" \
 
+
+def parse_message(message: str):
+      PRICE_REGEX = r"^.*\b(?![0+-])\d{5,}\b.*$"
       # some channels use this character for more beautiful texts like this: تـــومان so this line converts it to تومان 
       message = message.replace("ـ", "")
-
+      
       # converting Farsi or Arabic numbers to English numbers
       cleaned_message = convert_numbers(message)
 
-      matches = re.findall(reg, cleaned_message, re.IGNORECASE | re.MULTILINE)
+      matches = re.findall(PRICE_REGEX, cleaned_message, re.MULTILINE)
 
       # converting prices from Rial to Toman
       result = convert_currencies_to_toman(matches)
@@ -33,15 +31,20 @@ def convert_currencies_to_toman(matches):
             # extracting the currency from text 
             currency = re.findall(currencyReg, m, re.IGNORECASE)
             # a regex for detecting numbers
-            regNum   = r"\b(?:\d{1,3}(?:,\d{3})*|\d+)\b"
+            # regNum   = r"\b(?:\d{1,3}(?:[,.]\d{3})*|\d+)\b"
             # extracting the number
-            number   = re.findall(regNum, m)
-                  
+            
+            number   = re.findall(r"\b(?![0+-])\d{5,}\b", m)
+           
             if not number:
                   continue 
-            # removing any comma in numbers 13,000 => 13000
-            number   = int(number[0].replace(",", ""))
             
+            # removing any commas and dots in numbers 13,000 => 13000
+         
+            number   = number[0].replace(".", "")
+
+            number   = int(number.replace(",", ""))
+
             # checking if numbers has a coefficient like (هزار، میلیون، میلیارد)
             number = result_with_coefficient(m, number)
             
