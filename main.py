@@ -70,7 +70,12 @@ async def main():
                 elif commands[0] == "report" and tools.is_date(commands[1]):
                     # creating date time object to pass to db query
                     date_object = datetime.strptime(commands[1], "%Y-%m-%d").date()
-                    filepath = await utils.get_report_by_date(DB, date_object)
+                    
+                    comp_operator = "equal"
+                    if len(commands) == 3 and commands[2] in ["greater", "less"]:
+                        comp_operator = commands[2]
+
+                    filepath = await utils.get_report_by_date(DB, date_object, comp_operator)
 
                 # report command says to find rows by channel name specified
                 elif commands[0] == "report" and commands[1]:
