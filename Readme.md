@@ -119,7 +119,7 @@ Modify the txt file `CHANNELS` list.
 | price_toman | BIGINT     | Price in Toman                                  |
 | details     | TEXT       | Saves other info about products                 |
 | post_link   | TEXT       | Saves the link to the Telegram Message          |
-| websites_link   | TEXT (n:m relation)       | Saves links that was mentioned in the Telegram Message          |
+| website_links   | TEXT (n:m relation)       | Saves links that was mentioned in the Telegram Message          |
 | phone_numbers  | TEXT (n:m relation)       | Saves phone numbers that was mentioned in the Telegram Message          |
 | time        | TIMESTAMP  | Date & time of the message                      |
 
