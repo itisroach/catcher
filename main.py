@@ -97,18 +97,18 @@ async def main():
 
                
                 
+            else:
+                prices = messageParser.parse_message(event.text)
 
-            prices = messageParser.parse_message(event.text)
-
-            if prices:
-                for price in prices:
-                    channel_username = event.chat.username
-                    message_id = event.id
-                    # creating a link for each new message
-                    post_link = tools.make_post_link(channel_username, message_id)
-                    productId = await utils.add_product(DB, price["price"], channel_username, message_id, price["details"], post_link)
-                    await utils.extract_website_address(DB, event.text, productId)
-                    await utils.extract_phone_numbers(DB, event.text, productId)
+                if prices:
+                    for price in prices:
+                        channel_username = event.chat.username
+                        message_id = event.id
+                        # creating a link for each new message
+                        post_link = tools.make_post_link(channel_username, message_id)
+                        productId = await utils.add_product(DB, price["price"], channel_username, message_id, price["details"], post_link)
+                        await utils.extract_website_address(DB, event.text, productId)
+                        await utils.extract_phone_numbers(DB, event.text, productId)
 
         await client.run_until_disconnected()
 
