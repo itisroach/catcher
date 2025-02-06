@@ -9,7 +9,7 @@ import os
 # reading telegram API credentials
 API_ID    = tools.ReadEnvVar("API_ID")
 API_HASH  = tools.ReadEnvVar("API_HASH")
-
+SESSION_NAME = tools.ReadEnvVar("SESSION_NAME")
 
 
 
@@ -23,7 +23,7 @@ async def main():
     await DB.init_db()  
     
     # creating an instance of telegram client
-    client = TelegramClient("catcher", API_ID, API_HASH)
+    client = TelegramClient(SESSION_NAME, API_ID, API_HASH)
 
     # getting file path
     path = input("Please enter the path to the .txt file containing channels' usernames (each line one username): ")
