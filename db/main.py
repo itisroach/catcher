@@ -2,12 +2,14 @@ import asyncpg
 import asyncio
 from helpers.tools import ReadEnvVar
 from .queries import *
+import sys
 
 DBConfig = {
     "user": ReadEnvVar("DB_USER"),
     "password": ReadEnvVar("DB_PASS"),
     "host": ReadEnvVar("DB_ADDR"),
     "database": ReadEnvVar("DB_NAME"),
+    "port": ReadEnvVar("DB_PORT"),
     "server_settings": {"client_encoding": "UTF8"} 
 }
 
@@ -21,7 +23,12 @@ class Database():
 
 
     async def init_db(self):
-        self.pool = await asyncpg.create_pool(**DBConfig)
+        try: 
+            self.pool = await asyncpg.create_pool(**DBConfig)
+
+        except Exception as e:
+            sys.exit(e)
+            
         # crating a table for storing all products
         await self.pool.execute(create_products_table)
 
