@@ -1,4 +1,4 @@
-from tools import *
+from .tools import *
 from db import queries
 
 # a query to insert data to database
@@ -35,9 +35,12 @@ async def extract_phone_numbers(dbInstance, text, productId):
 
 
 # fetch products by date filter
-async def get_report_by_date(dbInstance, date):
-    products = await dbInstance.fetch_product_by_date(date)
+async def get_report_by_date(dbInstance, date, comparison_operator):
+    products = await dbInstance.fetch_product_by_date(date, comparison_operator)
     
+    if not products:
+        return generate_error(date)
+
     filepath = create_csv_file(products)
 
     return filepath
@@ -46,6 +49,10 @@ async def get_report_by_date(dbInstance, date):
 async def get_report_by_channel(dbInstance, channel):
     products = await dbInstance.fetch_product_by_channel(channel)
 
+    if not products:
+        return generate_error(channel)
+
     filepath = create_csv_file(products)
-    
+
+
     return filepath
