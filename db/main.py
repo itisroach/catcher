@@ -70,6 +70,16 @@ class Database():
     async def fetch_product_by_channel(self, channel: str):
         async with self.pool.acquire() as connection:
             return await connection.fetch(fetch_product_by_channel_query, channel)
+        
+    async def fetch_product_by_date(self, date: str, comparison_operators):
+        async with self.pool.acquire() as connection:
+            match comparison_operators:
+                case "equal":
+                    return await connection.fetch(fetch_products_by_date_equal_query, date)
+                case "greater":
+                    return await connection.fetch(fetch_products_by_date_greater_query, date)
+                case "less":
+                    return await connection.fetch(fetch_products_by_date_less_query, date)
 
     async def close_connection(self):
         await self.pool.close()

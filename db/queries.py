@@ -45,7 +45,7 @@ create_phone_numbers_junction_table = '''
 '''
 
 
-fetch_products_query = '''
+base_fetch_products = '''
     SELECT 
         p.id,
         p.price_toman,
@@ -61,25 +61,11 @@ fetch_products_query = '''
     LEFT JOIN websites w ON pw.website_id = w.id
     LEFT JOIN products_phone_numbers ppn ON p.id = ppn.product_id
     LEFT JOIN phone_numbers ph ON ppn.phone_number_id = ph.id
-    GROUP BY p.id
 '''
 
-fetch_product_by_channel_query = '''
-   SELECT 
-        p.id,
-        p.price_toman,
-        p.time,
-        p.channel,
-        p.details,
-        p.post_link,
-        p.message_id,
-        COALESCE(STRING_AGG(DISTINCT w.link, ', '), 'No Website') AS website_links,
-        COALESCE(STRING_AGG(DISTINCT ph.phone_number, ', '), 'No Phone Number') AS phone_numbers
-    FROM products p
-    LEFT JOIN products_websites pw ON p.id = pw.product_id
-    LEFT JOIN websites w ON pw.website_id = w.id
-    LEFT JOIN products_phone_numbers ppn ON p.id = ppn.product_id
-    LEFT JOIN phone_numbers ph ON ppn.phone_number_id = ph.id
+fetch_products_query = base_fetch_products+ ' GROUP BY p.id'
+
+fetch_product_by_channel_query = base_fetch_products+ '''
     WHERE p.channel = $1 
     GROUP BY p.id
 '''
@@ -100,3 +86,24 @@ insert_to_website_query = '''
 insert_to_website_junction_query = '''
     INSERT INTO products_websites(product_id, website_id) VALUES ($1, $2)
 '''
+
+
+
+
+fetch_products_by_date_equal_query = base_fetch_products + """
+    WHERE p.time::date = $1::date
+    GROUP BY p.id
+"""
+
+
+
+
+fetch_products_by_date_greater_query = base_fetch_products + """
+    WHERE p.time::date >= $1::date
+    GROUP BY p.id
+"""
+
+fetch_products_by_date_less_query = base_fetch_products + """
+    WHERE p.time::date <= $1::date
+    GROUP BY p.id
+"""
